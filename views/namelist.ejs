@@ -7,12 +7,12 @@
 <body>
 	<img src="/banner/banner.png" alt="Veebiprogrammeerimise kursuse bänner">
 	<h1><%= h1 %></h1>
-	<ul>
+	<ol>
 		<!--Teeme ejs tsükli, mis käib läbi massiivi names-->
 		<% names.forEach(function(sentence){ %>
 			<li><%= sentence %></li>
 		<% }); %>
-	</ul>
+	</ol>
 	<hr>
 	<ul>
 		<li><a href = "/">Avalehele</a></li>

@@ -36,16 +36,44 @@ app.get('/wisdom', (req, res) => {
 
 app.get('/names', (req, res) => {
     let allNames = [];
-    fs.readFile('public/txtfiles/log.txt', 'utf8', (err, data)=> { //callback funktisoon
+    let allElements = [];
+    let separatedElements = [];
+    fs.readFile('public/txtfiles/log.txt', 'utf8', (err, data)=> {
         if (err){
             throw err;
-        } 
+        }
         else {
-            allNames = data.replaceAll(",", " ").split(";"); //folkwisdom saab võrdseks dataga mis loeti ja saadeti
+            allNames = data.replaceAll(",", " ").split(";").filter(element => element.trim() !== '');
+            allElements = data.split(";")
+                .flatMap(item => item.split(","))
+                .map(element => element.trim())
+                .filter(element => element);
+
             //tuleb massiivi elemendi viimasest elemendist ehk ; lahti saada
+            /*for (element of allNames) {
+                element = element.replaceAll(";", " ").split(" ");
+                allElements += element
+            }*/
+            /*res.send(allElements)
+            }*/
+            //let modifiedOutput = [];
+            /*for (element of allElements){
+                if(element[0]){
+                    separatedElements += element[0] + ' ' + element[1] + ', salvestatud: ' + element[2];
+                }
+            }*/
+            /*for (let i = 0; i < allElements.length; i += 3) {
+                separatedElements.push(allElements.slice(i, i + 3));
+            }*/
+            for (let i = 0; i < allElements.length; i += 3) {
+                if (allElements[i] && allElements[i + 1] && allElements[i + 2]) {
+                    separatedElements.push([allElements[i], allElements[i + 1], allElements[i + 2]]);
+                }
+            }
+            console.log(separatedElements)
             res.render('namelist', {h1: 'Nimed', names: allNames}); //justlist on vaade. kogu folkWisdom massiivi saadad wisdom nime all(avalehele)
         }
-    }); 
+    });
 });
 
 app.listen(5128);
