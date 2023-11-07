@@ -112,14 +112,40 @@ app.post('/eestifilm/addfilmperson', (req, res)=>{ //selleks et salvestada info 
     });
 });
 
-app.get('/eestifilm/singlefilm', (req, res)=>{
-    res.render('singlefilm');
+app.get('/eestifilm/singlefilm', (req, res) => {
+    //console.log("app geti algusesse jõuab");
+    let sql = 'SELECT COUNT(id) AS max FROM movie';
+    let sqlResult = [];
+    connection.query(sql, (err, result) => {
+        if (err) {
+            res.render('singlefilm');
+            throw err;
+        } else {
+            //console.log("app.get countib");
+            res.render('singlefilm', {filmcount: result[0]["max"]});
+        }
+    });
 });
 
-app.get('/eestifilm/singlefilm', (req, res)=>{
-    let max_value = 'SELECT COUNT(id) FROM movie';
-    let sql = 'SELECT FROM movie WHERE id= '; //id on inputist??
 
+app.post('/eestifilm/singlefilm', (req, res)=>{
+    //console.log("app posti algusesse jõuab")
+    let notice = '';
+    //let = 'SELECT COUNT(id) FROM movie';
+    let sql = 'SELECT * FROM movie WHERE id=?'; //id on inputist??
+    let sqlResult = [];
+    connection.query(sql, [req.body.filmIdInput], (err, result) =>{
+        if (err) {
+            console.log("app.post error")
+            notice = "Viga. Ei leia filmi.";
+            res.render('singlefilmdisplay', {filmdata: sqlResult, notice: notice});
+            throw err;
+        } else {
+            //console.log("app post peaks toimima")
+            notice = "Otsing tehtud"
+            res.render('singlefilmdisplay', {filmdata: result, notice: notice});
+        }
+    });
 });
 
 app.listen(5128);

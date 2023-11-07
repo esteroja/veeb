@@ -12,13 +12,14 @@
 		<li><a href = "/">Avalehele</a></li>
 	</ul>
 	<hr>
-	<h2>Küsi filmi kohta</h2>
-	<form method="POST">
-		<label for="filmIdInput">Filmi järjekorra number listis</label>
-		<input type="number" name="filmIdInput" id="filmIdInput" min="1" max=<%= locals.filmcount %> required>
-		<br>
-		<input type="submit" name="filmIdSubmit" value="Otsi">
-	</form>
-	<!--<p><%= locals.notice || 'Ootel!' %></p> -->
+		<h3>Pealkiri</h3>
+		<p><%= filmdata[0].title %></p>
+		<h3>Valmimisaasta</h3>
+		<p><%= filmdata[0].production_year %></p>
+		<h3>Kestus</h3>
+		<p><%= filmdata[0].duration %> minutit</p>
+		<h3>Kirjeldus</h3>
+		<p><%= filmdata[0].description %></p>
+	<!--p><%= locals.notice || 'Ootel!' %></p>-->
 </body>
 </html>
