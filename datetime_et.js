@@ -4,12 +4,18 @@ const dateETformatted = function(){
 
     let dateNow = new Date();
     return dateNow.getDate() + ". " + monthNamesET[dateNow.getMonth()] + " " + dateNow.getFullYear();
- }
+}
 
 const timeFormatted = function() {
 
     let timestamp = new Date();
     return timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds();
+}
+
+const dateENGformatted = function() {
+
+    let dateENGNow = new Date();
+    return dateENGNow.getFullYear() + "-" + dateENGNow.getMonth() + "-" + dateENGNow.getDate();
 }
 
 const formatChange = function(engFormatDate) {
