@@ -9,14 +9,12 @@
 	<h1>Uudised</h1>
 	<ul>
 		<li><a href="/news">Uudiste avaleht</a></li>
+		<li><a href="/news/read">Viimased uudised</a></li>
 		<li><a href = "/">Avalehele</a></li>
 	</ul>
 	<hr>
-	<h2>Viimased uudised</h2>
-	<% readnews.forEach(function(news) { %>
-		<li><a href="/news/read/<%= news.id %>"><%= news.title %></li>
-	<br>
-	<% }); %>
-	</ol>
+	<h3><%= news.title %></h3>
+	<p>Lisatud: <%= news.added %></p>
+	<p><%= news.content %></p>
 </body>
 </html>

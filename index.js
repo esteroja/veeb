@@ -29,9 +29,8 @@ app.get('/timenow', (req, res)=>{
     //res.download('index.js')
     const dateNow = timeInfo.dateETformatted();
     const timeNow = timeInfo.timeFormatted();
-    const dateENGNow = timeInfo.dateENGformatted();
     //res.render('timenow');
-    res.render('timenow', {nowD: dateNow, nowT: timeNow, nowENGD: dateENGNow}); //loogelistes sulgudes objekt - nimi ja väärtuspaar??nowD on nowdate, selle nimega saadetakse ejs failile ja väärtus on datenow
+    res.render('timenow', {nowD: dateNow, nowT: timeNow}); //loogelistes sulgudes objekt - nimi ja väärtuspaar??nowD on nowdate, selle nimega saadetakse ejs failile ja väärtus on datenow
 });
 
 app.get('/wisdom', (req, res) => {
@@ -160,10 +159,11 @@ app.get('/news/add', (req, res)=>{
 app.post('/news/add', (req, res)=>{
     console.log("news add post töötab alguses");
     let notice = '';
-    let sql = 'INSERT INTO vpnews (id, title, content, added, expire, user_id, deleted) VALUES (?, ?, ?, ?, ?, 1, ?)';
-    connection.query(sql, [req.body.titleInput, req.body.contentInput, expireInput], (err, result)=>{
+    let sql = 'INSERT INTO vpnews (title, content, expire, user_id) VALUES (?, ?, ?, 1)';
+    connection.query(sql, [req.body.titleInput, req.body.contentInput, req.body.expireInput], (err, result)=>{
         if (err) {
             res.render('addnews');
+            console.log(result)
             throw err;
         } else {
             notice = 'Uudise salvestamine õnnestus!';
@@ -174,32 +174,43 @@ app.post('/news/add', (req, res)=>{
 
 
 app.get('/news/read', (req, res)=>{
-    let sql = 'SELECT * FROM `vp_news` WHERE expire > ' + dateENGNow + ' AND DELETED IS NULL ORDER BY id DESC';
+    const dateENGNow = timeInfo.dateENGformatted();
+    let sql = 'SELECT * FROM vpnews WHERE expire > ' + dateENGNow + ' AND DELETED IS NULL ORDER BY id DESC';
     let sqlResult = [];
     connection.query(sql, (err, result)=>{
         if (err) {
             res.render('readnews', {readnews: sqlResult, nowENGD: dateENGNow});
             throw err;
         } else {
-            console.log("news read töötab");
-            console.log(result);
+            //console.log("news read töötab");
+            //console.log(result);
             res.render('readnews', {readnews: result, nowENGD: dateENGNow});
         }
     });
 });
 
 
-app.get('/news/read/:id', (req, res)=>{
-    //res.render('readnews')
-    //sres.send('Tahame uudist, mille id on: ' + req.params.id);
+app.get('/news/read/:id', (req, res) => {
+    let sql = 'SELECT * FROM vpnews WHERE id = ? AND DELETED IS NULL ORDER BY id DESC';
+    let sqlResult = [];
+    connection.query(sql, [req.params.id], (err, result) => {
+        if (err) {
+            res.render('singlenews', {news: sqlResult})
+            throw err;
+        } else {
+            //console.log(result[0]);
+            //console.log(newsID)
+            res.render('singlenews', {news: result[0]});
+        }
+    });
 });
 
-app.get('/news/read/:id/:lang', (req, res)=>{
+//app.get('/news/read/:id/:lang', (req, res)=>{
     //res.render('readnews')
-    //console.log(req.params);
+    //console.log(req.params); //jj
     //console.log(req.query); //http://greeny.cs.tlu.ee:5128/news/read/100/est?color=red&imp=high
-    res.send('Tahame uudist, mille id on: ' + req.params.id);
-});
+    //res.send('Tahame uudist, mille id on: ' + req.params.id);
+//});
 
 
 

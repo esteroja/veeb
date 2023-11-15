@@ -51,4 +51,4 @@ const timeOfDayET = function() {
 
 }
 //ekspordin kõik asjad, järgnev on massiiv, nende nimedega asju tahan näidata väljapoole, koolon tähendab väärtuse andmist(tahan selle nime seda asja ja teise nimega teist asja)
-module.exports = {dateETformatted: dateETformatted, timeFormatted: timeFormatted, monthsET: monthNamesET, timeOfDayET: timeOfDayET}
+module.exports = {dateETformatted: dateETformatted, timeFormatted: timeFormatted, monthsET: monthNamesET, timeOfDayET: timeOfDayET, dateENGformatted: dateENGformatted}
