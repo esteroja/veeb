@@ -5,10 +5,16 @@ const mysql = require('mysql2');
 const timeInfo = require('./datetime_et');
 const bodyparser = require('body-parser');
 const dbInfo = require('../../vp23config');
+ //package fotode laadimiseks
+const multer = require('multer');
+//seadistame vahevara (middleware), mis määrab üleslaadimise kataloogi
+const upload = multer({dest: './public/gallery/orig/'});
+const sharp = require('sharp');
 
 app.set('view engine', 'ejs'); //tuleb määrata ära mis mootoriga express app tööle hakkab, visualiseerimise mootor
 app.use(express.static('public')); //express.jsi vahevara, static(kataloogi staatiliselt pakkumine) - võtke kasutusele kataloog mida serveerid vabalt ehk võimaldab ligipääseda vabalt kui tead aadressi
-app.use(bodyparser.urlencoded({extended: false})); //võrab päringu/requesti, sinna on kodeeritud sisse andmed, encodediga kodeerib lahti, extended false tähendab et kõige lihtsamad andmed ja pole nt lisatud faile,pilte vms, aint tekstiinfo, isegi numbrid(kuupäev) läheb sinna sisse
+//järgnev: kui ainult tekst, siis "false", siis "false", kui ka muud nagu nt pilti, siis "true"
+app.use(bodyparser.urlencoded({extended: true})); //võrab päringu/requesti, sinna on kodeeritud sisse andmed, encodediga kodeerib lahti, extended false tähendab et kõige lihtsamad andmed ja pole nt lisatud faile,pilte vms, aint tekstiinfo, isegi numbrid(kuupäev) läheb sinna sisse
 
 //loon andmebaasiühenduse
 const connection = mysql.createConnection({
@@ -212,7 +218,53 @@ app.get('/news/read/:id', (req, res) => {
     //res.send('Tahame uudist, mille id on: ' + req.params.id);
 //});
 
+app.get('/photoupload', (req, res) => {
+    res.render('photoupload');
+});
 
+app.post('/photoupload', upload.single('photoInput'), (req, res)=>{ //multeri upload, single ehk üks pilt, photoinput ejs failist
+    let notice = '';
+    console.log(req.file);
+    console.log(req.body); //ilma pildi infota
+    const fileName = 'vp_' + Date.now() + '.jpg';
+    //fs.rename(req.file.path, './public/gallery/orig/' + req.file.originalname, (err, result)=>{
+        //console.log('faili laadimise viga: ' + err)
+    fs.rename(req.file.path, './public/gallery/orig/' + fileName, (err)=>{
+        console.log('faili laadimise viga: ' + err)
+    });
+    //loome kaks väiksema mõõduga pildi varianti
+    sharp('./public/gallery/orig/' + fileName).resize(800,600).jpeg({quality : 90}).toFile('./public/gallery/normal/' + fileName);
+    sharp('./public/gallery/orig/' + fileName).resize(100,100).jpeg({quality : 90}).toFile('./public/gallery/thumbs/' + fileName)
 
+    //foto andmed andmetabelisse
+    let sql = 'INSERT INTO vpgallery (filename, originalname, alttext, privacy, user_id) VALUES (?, ?, ?, ?, ?)';
+    const user_id = 1;
+    connection.query(sql, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, user_id], (err, result)=>{
+        if(err) {
+            throw err;
+            notice = 'Foto andmete salvestamine ebaÃµnnestus!';
+            res.render('photoupload', {notice: notice});
+		} else {
+			notice = 'Foto ' + req.file.originalname + ' laeti edukalt Ã¼les!';
+			res.render('photoupload', {notice: notice});
+		}
+	});
+});
+
+app.get('/photogallery', (req, res)=>{
+    //andmebaasist tuleb lugeda piltide id, filename ja alttext
+    let sql = 'SELECT * FROM vpgallery WHERE DELETED IS NULL ORDER BY id DESC';
+    let sqlResult = [];
+    connection.query(sql, (err, result)=>{
+        if (err){
+            console.log("photogalerii error");
+            res.render('photogallery', {photos: sqlResult});
+        } else {
+            console.log("photogalerii else blokk");
+            console.log(result);
+            res.render('photogallery', {photos: result})
+        }
+    });
+});
 
 app.listen(5128);
