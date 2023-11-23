@@ -10,6 +10,7 @@ const multer = require('multer');
 //seadistame vahevara (middleware), mis määrab üleslaadimise kataloogi
 const upload = multer({dest: './public/gallery/orig/'});
 const sharp = require('sharp');
+const async = require('async');
 
 app.set('view engine', 'ejs'); //tuleb määrata ära mis mootoriga express app tööle hakkab, visualiseerimise mootor
 app.use(express.static('public')); //express.jsi vahevara, static(kataloogi staatiliselt pakkumine) - võtke kasutusele kataloog mida serveerid vabalt ehk võimaldab ligipääseda vabalt kui tead aadressi
@@ -114,6 +115,41 @@ app.post('/eestifilm/addfilmperson', (req, res)=>{ //selleks et salvestada info 
         } else {
             notice = req.body.firstNameInput + ' ' + req.body.lastNameInput + ' ' + ' salvestamine õnnestus.';
             res.render('addfilmperson', {notice: notice});
+        }
+    });
+});
+
+app.get('/eestifilm/addfilmrelation', (req, res) => {
+    //kasutades asynv moodulit paneme mitu tegevust paralleelselt tööle
+    //kõigepealt loome tegevuste loendi
+    const myQueries = [
+        function(callback){
+            connection.execute('SELECT id,first_name,last_name from person', (err, result)=> {
+                if (err) {
+                    return callback(err);
+                } else {
+                    return callback(null, result);
+                }
+            })
+        },
+        function(callback) {
+            connection.execute('SELECT id,title from movie', (err, result)=> {
+                if (err) {
+                    return callback(err);
+                } else {
+                    return callback(null, result);
+                }
+            })
+        } //veel , ja järgmine function jne
+    ];
+    //paneme kõik need paralleelselt tööle
+    async.parallel(myQueries, (err, results) =>{
+        if (err){
+            throw err;
+        } else {
+            //siin kõik asjad mis on vaja teha
+            console.log(results)
+            res.render('addfilmrelation');
         }
     });
 });
@@ -239,7 +275,7 @@ app.post('/photoupload', upload.single('photoInput'), (req, res)=>{ //multeri up
     //foto andmed andmetabelisse
     let sql = 'INSERT INTO vpgallery (filename, originalname, alttext, privacy, user_id) VALUES (?, ?, ?, ?, ?)';
     const user_id = 1;
-    connection.query(sql, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, user_id], (err, result)=>{
+    connection.execute(sql, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, user_id], (err, result)=>{
         if(err) {
             throw err;
             notice = 'Foto andmete salvestamine ebaÃµnnestus!';
@@ -253,9 +289,9 @@ app.post('/photoupload', upload.single('photoInput'), (req, res)=>{ //multeri up
 
 app.get('/photogallery', (req, res)=>{
     //andmebaasist tuleb lugeda piltide id, filename ja alttext
-    let sql = 'SELECT * FROM vpgallery WHERE DELETED IS NULL ORDER BY id DESC';
+    let sql = 'SELECT id,filename,alttext FROM vpgallery WHERE privacy > 1 AND deleted IS NULL ORDER BY id DESC';
     let sqlResult = [];
-    connection.query(sql, (err, result)=>{
+    connection.execute(sql, (err, result)=>{
         if (err){
             console.log("photogalerii error");
             res.render('photogallery', {photos: sqlResult});

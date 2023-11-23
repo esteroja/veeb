@@ -2,8 +2,10 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Andrus Rinde, veebiprogrammeerimine 2023</title>
+	<title>Ester Ojala, veebiprogrammeerimine 2023</title>
 	<link rel="stylesheet" href="/style/gallery.css">
+	<link rel="stylesheet" href="/style/modal.css">
+	<script src="/script/gallery.js" defer></script>
 </head>
 <body>
 	<img src="/banner/banner.png" alt="veebiprogrammeerimise kursuse banner">
@@ -12,11 +14,23 @@
 		<li><a href="/">Avalehele</a></li>
 	</ul>
 	<hr>
+	<dialog id="modal" class="modalarea">
+		<span id="modalClose" class="modalclose">&times;</span>
+		<div class="modalhorisontal">
+			<div class="modalvertical">
+				<p id="modalCaption"></p>
+				<img id="modalImage" src="/pics/empty.png" alt="Galeriipilt">
+			</div>
+		</div>
+	</dialog>
+
+
+
 	<h2>Galerii</h2>
 	<div class="gallery">
 		<% photos.forEach(function(photo) { %>
 			<div class="thumbgallery">
-				<img src="gallery/thumbs/<%= photo.filename %>" alt="<%= photo.alttext %>" data-filename="<%= photo.filename %>" data-id="1" class="thumbs">
+				<img src="gallery/thumbs/<%= photo.filename %>" alt="<%if(photo.alttext != ''){%><%=photo.alttext%><%}else{%>Galeriipilt<%}%>" data-filename="<%= photo.filename %>" data-id="1" class="thumbs">
 				<p></p> 
 			</div>
 		<% }); %>
