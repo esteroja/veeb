@@ -5,28 +5,37 @@
 	<title>Ester Ojala, veebiprogrammeerimine 2023</title>
 </head>
 <body>
-	<img src="/banner/banner.png" alt="Veebiprogrammeerimise kursuse bänner">
-	<h1>Eesti film</h1>
-	<ul>
-		<li><a href="/eestifilm">Eesti filmide avaleht</a></li>
-		<li><a href = "/">Avalehele</a></li>
-	</ul>
-	<hr>
-	<h2>Lisa filmitegelase ja filmi seos</h2>
-	<form method="POST">
-		<label for="personInput">Filmitegelane</label>
-		<select id="personInput" name="personInput">
-			<option value="0" selected disabled>Vali tegelane</option>
-			<option value="1">Kuulus Meesnäitleja</option>
-			<option value="2">Kuulus Naisnäitleja</option>
-		</select>
-		<label for="filmInput">Film</label>
-		<select name="filmInput" id="filmInput">
-			<option value="0" selected disabled>Vali film</option>
-			<option value="1">Metsaelu</option>
-			<option value="2">Jahilugu</option>
-		</select>
-	</form>
-	<p><%= locals.notice || 'Ootel!' %></p>
+<img src="/banner/banner.png" alt="Veebiprogrammeerimise kursuse bänner">
+<h1>Eesti film</h1>
+<ul>
+	<li><a href="/eestifilm">Eesti filmide avaleht</a></li>
+	<li><a href = "/">Avalehele</a></li>
+</ul>
+<hr>
+<h2>Lisa filmitegelase ja filmi seos</h2>
+<form method="POST">
+	<label for="personInput">Filmitegelane</label>
+	<select id="personInput" name="personInput">
+		<option value="0" selected disabled>Vali tegelane</option>
+		<% data[0].forEach(function(person_detail) { %>
+			<option value="<%= person_detail.id %>"><%= person_detail.first_name %> <%= person_detail.last_name %></option>
+		<% }); %>
+	</select>
+	<label for="filmInput">Film</label>
+	<select name="filmInput" id="filmInput">
+		<option value="0" selected disabled>Vali film</option>
+		<% data[1].forEach(function(movie_detail) { %>
+		<option value="<%= movie_detail.id %>"><%= movie_detail.title %> </option>
+		<% }); %>
+	</select>
+	<label for="positionInput">Positsioon</label>
+	<select for="positionInput" id="positionInput">
+		<option value="0" selected disabled>Vali positsioon</option>
+		<% data[2].forEach(function(position_detail) { %>
+			<option value="<%= position_detail.id %>"><%= position_detail.position_name %></option>
+		<% }); %>
+	</select>
+</form>
+<p><%= locals.notice || 'Ootel!' %></p>
 </body>
 </html>

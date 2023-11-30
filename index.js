@@ -11,6 +11,13 @@ const multer = require('multer');
 const upload = multer({dest: './public/gallery/orig/'});
 const sharp = require('sharp');
 const async = require('async');
+//paroolide krüpteerimiseks
+const bcrypt = require('bcrypt');
+//sessiooni jaoks
+const session = require('express-session');
+
+app.use(session({secret: 'minuAbsoluutseltSalajaneVõti', saveUninitialized: true, resave: true})); //1) võti 2) aegumise aeg (prg ei pannud) 3)sessioon hoiustatakse ilma huvitavate andmeteta
+let mySession;
 
 app.set('view engine', 'ejs'); //tuleb määrata ära mis mootoriga express app tööle hakkab, visualiseerimise mootor
 app.use(express.static('public')); //express.jsi vahevara, static(kataloogi staatiliselt pakkumine) - võtke kasutusele kataloog mida serveerid vabalt ehk võimaldab ligipääseda vabalt kui tead aadressi
@@ -28,7 +35,93 @@ const connection = mysql.createConnection({
 app.get('/', (req, res)=>{
     //res.send('see töötab');
     //res.download('index.js')
-    res.render('index');
+    notice = 'Sisesta oma kasutajakonto andmed';
+    res.render('index', {notice: notice});
+});
+
+app.post('/', (req, res)=>{
+    let notice = "Sisesta oma kasutajakonto andmed!";
+    if (!req.body.emailInput || !req.body.passwordInput) {
+        console.log('Paha');
+        res.render('index', {notice: notice});
+    } else {
+        console.log('Hea');
+        let sql = 'SELECT password FROM vpusers WHERE email = ?';
+        connection.execute(sql, [req.body.emailInput], (err, result)=>{
+            if (err) {
+                notice = "Tehnilise vea tõttu ei saa sisse logida.";
+                console.log(notice);
+                res.render('index', {notice: notice});
+            } else {
+                if (result[0] != null){
+                    console.log(result[0].password); 
+                    bcrypt.compare(req.body.passwordInput, result[0].password, (err, compareresult)=>{ //argumendid: 1) parool, mis on lahtine tekst 2) räsi 3) callback
+                        if (err) {
+                            throw err;
+                        } else {
+                            if(compareresult){ //if true lause
+                                //console.log('Sisse');
+                                mySession = req.session;
+                                mySession.userName = req.body.emailInput
+
+                                notice = mySession.userName + ' on sisse loginud.';
+                                res.render('index', {notice: notice});
+                            } else {
+                                notice = 'Kasutajanimi või parool oli vigane'
+                                console.log('Ei saa sisse');
+                                res.render('index', {notice: notice});
+    
+                            }
+                        }
+                    });
+                } else { 
+                    notice = 'Kasutajatunnus või parool oli vigane';
+                    console.log(notice);
+                    res.render('index', {notice: notice});
+                }
+            }
+        });
+        //res.render('index', {notice: notice});
+    }
+});
+
+app.get('/logout', (req, res)=>{
+    req.session.destroy(); //hävitab sessiooni
+    mySession = null;
+    console.log('Logi välja');
+    res.redirect('/');
+});
+
+app.get('/signup', (req, res)=>{
+	res.render('signup');
+});
+
+app.post('/signup', (req, res)=>{
+    let notice = "Ootan andmeid!";
+	console.log(req.body);
+	if(!req.body.firstNameInput || !req.body.lastNameInput || !req.body.genderInput || !req.body.birthInput || !req.body.emailInput || req.body.passwordInput.length < 8 || req.body.passwordInput !== req.body.confirmPasswordInput){
+		console.log('Andmeid on puudu või pole nad korrektsed!');
+        notice = "Andmeid on puudu või pole nad korrektsed!";
+        res.render('signup', {notice: notice});
+	} else {
+		console.log('Ok!');
+        bcrypt.genSalt(10, (err, salt)=>{
+            bcrypt.hash(req.body.passwordInput, salt, (err, pwdhash)=>{
+                let sql = 'INSERT INTO vpusers (firstname, lastname, birthdate, gender, email, password) VALUES (?, ?, ?, ?, ?, ?)';
+                connection.execute(sql, [req.body.firstNameInput, req.body.lastNameInput, req.body.birthInput, req.body.genderInput, req.body.emailInput, pwdhash], (err,result)=>{
+                    if (err) {
+                        console.log(err);
+                        notice = "Tehnilistel põhjustel kasutajat ei loodud.";
+                        res.render('signup', {notice: notice});
+                    } else {
+                        console.log(result)
+                        notice = "Kasutaja " + req.body.emailInput + " edukalt loodud!";
+                        res.render('signup', {notice: notice});
+                    }
+                });
+            });
+        });
+	}
 });
 
 app.get('/timenow', (req, res)=>{
@@ -123,7 +216,7 @@ app.get('/eestifilm/addfilmrelation', (req, res) => {
     //kasutades asynv moodulit paneme mitu tegevust paralleelselt tööle
     //kõigepealt loome tegevuste loendi
     const myQueries = [
-        function(callback){
+        function conn_person(callback){
             connection.execute('SELECT id,first_name,last_name from person', (err, result)=> {
                 if (err) {
                     return callback(err);
@@ -131,8 +224,8 @@ app.get('/eestifilm/addfilmrelation', (req, res) => {
                     return callback(null, result);
                 }
             })
-        },
-        function(callback) {
+        }, // KOMA ON OLULINE
+        function conn_movie (callback) {
             connection.execute('SELECT id,title from movie', (err, result)=> {
                 if (err) {
                     return callback(err);
@@ -140,7 +233,16 @@ app.get('/eestifilm/addfilmrelation', (req, res) => {
                     return callback(null, result);
                 }
             })
-        } //veel , ja järgmine function jne
+        }, //veel , ja järgmine function jne
+        function conn_position (callback) {
+            connection.execute('SELECT id, position_name FROM position', (err, result) => {
+                if (err) {
+                    return callback(err);
+                } else {
+                    return callback(null, result);
+                }
+            })
+        }
     ];
     //paneme kõik need paralleelselt tööle
     async.parallel(myQueries, (err, results) =>{
@@ -149,7 +251,7 @@ app.get('/eestifilm/addfilmrelation', (req, res) => {
         } else {
             //siin kõik asjad mis on vaja teha
             console.log(results)
-            res.render('addfilmrelation');
+            res.render('addfilmrelation', {data: results});
         }
     });
 });
@@ -254,7 +356,7 @@ app.get('/news/read/:id', (req, res) => {
     //res.send('Tahame uudist, mille id on: ' + req.params.id);
 //});
 
-app.get('/photoupload', (req, res) => {
+app.get('/photoupload', checkLogin, (req, res) => { //checkLogin on vahevara e tarkvara mis läheb tööle requesti tulekul enne kui ülejäänud osa(app.get marsruut) jõuab tööle minna
     res.render('photoupload');
 });
 
@@ -278,10 +380,10 @@ app.post('/photoupload', upload.single('photoInput'), (req, res)=>{ //multeri up
     connection.execute(sql, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, user_id], (err, result)=>{
         if(err) {
             throw err;
-            notice = 'Foto andmete salvestamine ebaÃµnnestus!';
+            notice = 'Foto andmete salvestamine ebaõnnestus!';
             res.render('photoupload', {notice: notice});
 		} else {
-			notice = 'Foto ' + req.file.originalname + ' laeti edukalt Ã¼les!';
+			notice = 'Foto ' + req.file.originalname + ' laeti edukalt üles!';
 			res.render('photoupload', {notice: notice});
 		}
 	});
@@ -303,4 +405,19 @@ app.get('/photogallery', (req, res)=>{
     });
 });
 
+function checkLogin(req, res, next) {
+    console.log('Kontrollime sisselogimist');
+    if (req.mySession !== null) {
+        if (mySession.userName) {
+            console.log('Täitsa sees on');
+            next(); //tähendab, et vahevara annab ülesande tagasi
+        } else {
+            console.log('Ei ole üldse sees');
+            res.redirect('/');
+        } 
+    } else {
+        res.redirect('/');
+    }
+
+}
 app.listen(5128);
