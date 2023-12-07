@@ -30,7 +30,7 @@
 	<div class="gallery">
 		<% photos.forEach(function(photo) { %>
 			<div class="thumbgallery">
-				<img src="gallery/thumbs/<%= photo.filename %>" alt="<%if(photo.alttext != ''){%><%=photo.alttext%><%}else{%>Galeriipilt<%}%>" data-filename="<%= photo.filename %>" data-id="1" class="thumbs">
+				<img src="gallery/thumbs/<%= photo.filename %>" alt="<%if(photo.alttext != ''){%><%=photo.alttext%><%}else{%>Galeriipilt<%}%>" data-filename="<%= photo.filename %>" data-id="<%= photo.user_id %>" class="thumbs">
 				<p></p> 
 			</div>
 		<% }); %>
