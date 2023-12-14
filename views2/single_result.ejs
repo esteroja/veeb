@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Palliviske tulemused</title>
+</head>
+<body>
+    <li><a href = "/">Tagasi</a></li>
+	<h2>Võistleja <%= result.player_number %> tulemused</h2>
+    <hr>
+	<h3>Viske pikkus </h3>
+    <% playerInfo.forEach(function(resultInfo) { %>
+		<li>Kuupäev: <%= resultInfo.date %></li>
+        <li>Sooritus: <%= resultInfo.result %> meetrit</li>
+	<% }); %>
+	<p><%= locals.notice || 'Ootel!' %></p>
+</body>
+</html>

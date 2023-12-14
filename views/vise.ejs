@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Palliviske tulemused</title>
+</head>
+<body>
+	<h2>Sisesta palliviske andmed</h2>
+	<form method="POST">
+		<label for="personInput">Võistleja number</label>
+		<input type="text" name="personInput" id="personInput" placeholder="Võistleja number..." required>
+		<br>
+		<label for="dateInput">Viske soorituse kuupäev</label>
+		<input type="date" name="dateInput" id="dateInput" required>
+		<br>
+        <label for="resultInput">Palliviske pikkus meetrites</label>
+		<input type="text" name="resultInput" id="resultInput" placeholder="Viske pikkus meetrites..." required>
+		<br>
+		<input type="submit" name="dataSubmit" value="Salvesta">
+	</form>
+	<p><%= locals.notice || 'Ootel!' %></p>
+</body>
+</html>

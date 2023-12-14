@@ -19,7 +19,7 @@ const bcrypt = require('bcrypt');
 //sessiooni jaoks
 const session = require('express-session');
 const mime = require('mime-types');
-//const sizeOf = require('image-size');
+const sizeOf = require("image-size");
 
 app.use(session({secret: 'minuAbsoluutseltSalajaneVõti', saveUninitialized: true, resave: true})); //1) võti 2) aegumise aeg (prg ei pannud) 3)sessioon hoiustatakse ilma huvitavate andmeteta
 let mySession;
@@ -450,7 +450,7 @@ app.post('/photoupload', upload.single('photoInput'), (req, res)=>{ //multeri up
     //loome kaks väiksema mõõduga pildi varianti
     sharp('./public/gallery/orig/' + fileName).resize(800,600).jpeg({quality : 90}).toFile('./public/gallery/normal/' + fileName);
     sharp('./public/gallery/orig/' + fileName).resize(100,100).jpeg({quality : 90}).toFile('./public/gallery/thumbs/' + fileName)
-    let dimensions = sizeOf('./public/gallery/orig/' + fileName);
+    const dimensions = sizeOf('./public/gallery/orig/' + fileName);
     console.log(dimensions.width, dimensions.height)
     //foto andmed andmetabelisse
     let sql = 'INSERT INTO vpgallery (filename, originalname, alttext, privacy, user_id) VALUES (?, ?, ?, ?, ?)';
