@@ -380,7 +380,7 @@ app.post('/news/add', (req, res)=>{
 
 app.get('/news/read', (req, res)=>{
     const dateENGNow = timeInfo.dateENGformatted();
-    let sql = 'SELECT * FROM vpnews WHERE expire > ' + dateENGNow + ' AND DELETED IS NULL ORDER BY id DESC';
+    let sql = 'SELECT * FROM vpnews WHERE expire > ' + dateENGNow + ' AND DELETED IS NULL  ORDERBY id DESC';
     let sqlResult = [];
     pool.getConnection((err, conn)=>{
         if(err){

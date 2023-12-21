@@ -6,13 +6,14 @@
 </head>
 <body>
     <li><a href = "/">Tagasi</a></li>
-	<h2>Võistleja <%= result.player_number %> tulemused</h2>
+	<h2>Võistleja <%= playerInfo[0].player_number %> tulemused</h2>
     <hr>
-	<h3>Viske pikkus </h3>
     <% playerInfo.forEach(function(resultInfo) { %>
 		<li>Kuupäev: <%= resultInfo.date %></li>
-        <li>Sooritus: <%= resultInfo.result %> meetrit</li>
+        <li>Viske pikkus: <%= resultInfo.player_result %> meetrit</li>
+		<br>
 	<% }); %>
+	<hr>
 	<p><%= locals.notice || 'Ootel!' %></p>
 </body>
 </html>

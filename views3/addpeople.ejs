@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Sisesta sisenejad või väljujad</title>
+</head>
+<body>
+<h1>Sisesta sisenejad või väljujad</h1>
+<form method="POST">
+    <label for="movingInput">Siseneb või väljub</label>
+    <select id="movingInput" name="movingInput">
+        <option value="0" selected disabled>Tee valik</option>
+        <option value="siseneb">Siseneb</option>
+        <option value="väljub">Väljub</option>
+    </select>
+    <br>
+    <label for="femStudInput">Naissoost üliõpilaste arv</label>
+    <input type="number" step="1" name="femStudInput" id="femStudInput" placeholder="Naisüliõpilased...">
+    <br>
+    <label for="maleStudInput">Meessoost üliõpilaste arv</label>
+    <input type="number" step="1" name="maleStudInput" id="maleStudInput" placeholder="Meesüliõpilased...">
+    <br>
+    <label for="femWorkInput">Naissoost töötajate arv</label>
+    <input type="number" step="1" name="femWorkInput" id="femWorkInput" placeholder="Naistöötajad...">
+    <br>
+    <label for="maleWorkInput">Meessoost töötajate arv</label>
+    <input type="number" step="1" name="maleWorkInput" id="maleWorkInput" placeholder="Meestöötajad...">
+    <br>
+    <input type="submit" name="dataSubmit" value="Salvesta">
+</form>
+<br>
+<ul>
+    <li><a href="/peopleoverview">Ülevaade</a></li>
+</ul>
+<p><%= locals.notice || 'Ootel!' %></p>
+</body>
+</html>

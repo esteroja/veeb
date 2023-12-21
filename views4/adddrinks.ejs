@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Karastusjookide lisamine</title>
+</head>
+<body>
+    <a href="/owner">Tagasi</a>
+    <h2>Lisa jooke</h2>
+    <form method="POST">
+        <label for="selectedDrink">Joogi nimetus</label>
+        <select id="selectedDrink" name="selectedDrink">
+            <option value="0" selected disabled>Vali jook</option>
+            <% stockData.forEach(function(drink_detail) { %>
+                <option value="<%= drink_detail.id %>"><%= drink_detail.drink %></option>
+            <% }); %>
+        </select>
+        <br>
+        <label for="stockInput">Sisesta lisatud jookide arv</label>
+        <input type="number" step="1" name="stockInput" id="stockInput" placeholder="Jookide arv..." required>
+        <br>
+        <button type="submit">Lisa</button>
+    </form>
+    <p><%= locals.notice || 'Ootel!' %></p>
+</body>
+</html>

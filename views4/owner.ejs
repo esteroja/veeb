@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Karastusjookide haldusleht</title>
+</head>
+<body>
+    <h2>Hetkel kogunenud rahasumma</h2>
+    <p><%= data.money[0].money_amount %> eurot on kasum</p>
+    <br>
+	<h2>Jookide laoseis</h2>
+    <% data.stockData.forEach(function(element) { %>
+        <ul>
+            <li><%= element.drink %> - <%= element.stock %> tk laos.</li>
+        </ul>
+    <% }); %>
+    <form method="POST">
+        <label for="selectedDrink">Joogi nimetus hetkel</label>
+        <select id="selectedDrink" name="selectedDrink">
+            <option value="0" selected disabled>Vali jook</option>
+            <% data.stockData.forEach(function(drink_detail) { %>
+                <option value="<%= drink_detail.id %>"><%= drink_detail.drink %></option>
+            <% }); %>
+        </select>
+        <br>
+        <label for="newNameInput">Sisesta uus nimi</label>
+		<input type="text" name="newNameInput" id="newNameInput" placeholder="Joogi nimi..." required>
+		<br>
+        <label for="newPriceInput">Sisesta uus hind</label>
+		<input type="number" step="0.01" name="newPriceInput" id="newPriceInput" placeholder="Hind eurodes..." required>
+		<br>
+        <button type="submit">Osta</button>
+	</form>
+	<br>
+    <a href="/adddrinks">Karastusjookide lisamine</a>
+	<p><%= locals.notice || 'Ootel!' %></p>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Karastusjookide automaat</title>
+</head>
+<body>
+	<h1>Vali jook, mida soovid osta</h1>
+	<form method="POST">
+        <% drinkData.forEach(function(drink) { %>
+            <% if (drink.stock > 0) { %>
+                <input type="radio" id="drinkInput<%= drink.id %>" name="selectedDrink" value="<%= drink.id %>">
+                <label for="drinkInput<%= drink.id %>"><%= drink.drink %> - <%= drink.unitprice %> eurot.</label><br>
+            <% } %>
+        <% }); %>
+        <button type="submit">Osta</button>
+	</form>
+	<br>
+	<p><%= locals.notice || 'Ootel!' %></p>
+    <ul>
+        <li><a href="/owner">Haldusleht</a></li>
+    </ul>
+</body>
+</html>

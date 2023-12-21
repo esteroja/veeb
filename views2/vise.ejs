@@ -14,10 +14,18 @@
 		<input type="date" name="dateInput" id="dateInput" required>
 		<br>
         <label for="resultInput">Palliviske pikkus meetrites</label>
-		<input type="text" name="resultInput" id="resultInput" placeholder="Viske pikkus meetrites..." required>
+		<input type="number" step="0.01" name="resultInput" id="resultInput" placeholder="Viske pikkus meetrites..." required>
 		<br>
 		<input type="submit" name="dataSubmit" value="Salvesta">
 	</form>
+	<br>
+	<h3>Siiani sisestatud 3 parimat mängijat ja nende tulemused</h3>
+	<hr>
+	<ul>
+		<li>1. KOHT: Võistleja <%= bestPlayers[0].player_number %>. Tulemus: <%= bestPlayers[0].max_result%> meetrit.</li>
+		<li>2. KOHT: Võistleja <%= bestPlayers[1].player_number %>. Tulemus: <%= bestPlayers[1].max_result%> meetrit.</li>
+		<li>3. KOHT: Võistleja <%= bestPlayers[2].player_number %>. Tulemus: <%= bestPlayers[2].max_result%> meetrit.</li>
+	</ul>
 	<p><%= locals.notice || 'Ootel!' %></p>
 </body>
 </html>
